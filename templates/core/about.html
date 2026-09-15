@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% block title %}À propos — {{ store_name }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:720px;padding:52px 18px;">
+  <h1 style="font-size:1.8rem;">À propos de {{ store_name }}</h1>
+  <p>
+    Chez <strong>{{ store_name }}</strong>, nous sélectionnons soigneusement des produits
+    de qualité vendus à un prix juste. Notre objectif : vous offrir la meilleure expérience
+    d'achat en ligne en Algérie.
+  </p>
+  <h2 style="font-size:1.2rem;margin-top:30px;">Comment commander ?</h2>
+  <ol style="line-height:2;">
+    <li>Parcourez le catalogue et ajoutez vos articles au panier.</li>
+    <li>Choisissez la livraison à votre adresse.</li>
+    <li>Payez en ligne (Edahabia / CIB) ou à la livraison.</li>
+    <li>Recevez votre commande et validez à la réception.</li>
+  </ol>
+  <h2 style="font-size:1.2rem;margin-top:30px;">Livraison</h2>
+  <p>Livraison partout en Algérie. Offerte dès <strong>{{ free_shipping_threshold }} {{ store_currency_symbol }}</strong>, sinon {{ shipping_flat_rate }} {{ store_currency_symbol }}.</p>
+  <h2 style="font-size:1.2rem;margin-top:30px;">Paiement sécurisé</h2>
+  <p>Toutes les transactions en ligne passent par <strong>Chargily</strong> (Edahabia de l'Algérie Poste et CIB de SATIM). Un reçu est généré pour chaque paiement.</p>
+</div>
+{% endblock %}

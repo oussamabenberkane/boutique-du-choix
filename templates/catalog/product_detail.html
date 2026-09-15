@@ -1,0 +1,165 @@
+{% extends "core/base.html" %}
+{% block meta_description %}{{ meta_description|default:product.name }}{% endblock %}
+
+{% block content %}
+<div class="container pdp">
+  <div class="pdp-gallery">
+    <div class="gallery-main">
+      {% if primary_image %}
+        <img src="{{ primary_image.image.url }}" alt="{{ primary_image.alt|default:product.name }}" id="mainImage">
+      {% else %}
+        <div style="display:grid;place-items:center;height:100%;color:var(--muted);">Image bientôt disponible</div>
+      {% endif %}
+    </div>
+    {% if images|length > 1 %}
+      <div class="gallery-thumbs">
+        {% for img in images %}
+          <img src="{{ img.image.url }}" alt="{{ img.alt|default:product.name }}" data-full="{{ img.image.url }}" class="{% if forloop.first %}active{% endif %}">
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="pdp-info">
+    <nav class="pdp-breadcrumb">
+      <a href="{% url 'core:home' %}">Accueil</a> ›
+      <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+    </nav>
+
+    <h1>{{ product.name }}</h1>
+
+    <div class="pdp-rating">
+      {% if product.average_rating %}
+        <span class="stars">★ {{ product.average_rating|floatformat:1 }}</span>
+        <a href="#avis">({{ product.review_count }} avis)</a>
+      {% else %}
+        <span style="color:var(--muted);">Soyez le premier à donner votre avis</span>
+      {% endif %}
+    </div>
+
+    {% if product.short_description %}
+      <p class="pdp-short">{{ product.short_description }}</p>
+    {% endif %}
+
+    <div class="pdp-price">
+      {% if product.is_on_sale %}
+        <span class="price-compare">{{ product.compare_at_price|floatformat:0 }} {{ store_currency_symbol }}</span>
+      {% endif %}
+      <span class="price">{{ product.price|floatformat:0 }} {{ store_currency_symbol }}</span>
+      {% if product.is_on_sale %}<span class="badge badge-sale">Promo -{{ product.discount_percent }}%</span>{% endif %}
+    </div>
+
+    {% if product.has_variants %}
+      <div class="stock-line stock-ok">Plusieurs déclinaisons disponibles</div>
+    {% else %}
+      <div class="stock-line">
+        {% if product.stock > 10 %}
+          <span class="stock-ok">✓ En stock</span>
+        {% elif product.stock > 0 %}
+          <span class="stock-low">Plus que {{ product.stock }} en stock — commandez vite</span>
+        {% else %}
+          <span class="stock-out">✗ Rupture de stock</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="buy-box">
+      <form action="{% url 'cart:add_to_cart' product.pk %}" method="post">
+        {% csrf_token %}
+        {% if has_variants %}
+          <div class="form-field">
+            <label for="id_variant">Déclinaison</label>
+            <select id="id_variant" name="variant" required>
+              <option value="">Choisir…</option>
+              {% for v in product.variants.all %}
+                {% if v.is_active %}
+                  <option value="{{ v.pk }}" {% if v.stock == 0 %}disabled{% endif %}>
+                    {{ v.name }} — {% if v.extra_price > 0 %}+{{ v.extra_price|floatformat:0 }}{% else %}{{ product.price|floatformat:0 }}{% endif %} {{ store_currency_symbol }}{% if v.stock == 0 %} (rupture){% endif %}
+                  </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+        <div class="buy-row">
+          <input class="qty-input" type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" aria-label="Quantité">
+          <div class="buy-actions">
+            <button class="btn btn-primary" type="submit">Ajouter au panier</button>
+          </div>
+        </div>
+        <div class="buy-actions" style="margin-top:10px;">
+          <button class="btn btn-dark" type="submit" name="next" value="checkout">Acheter maintenant</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item"><strong>🚚 Livraison</strong> offerte dès {{ free_shipping_threshold }} DA</div>
+      <div class="trust-item"><strong>💳 Paiement</strong> en ligne ou à la livraison</div>
+      <div class="trust-item"><strong>⭐⭐⭐⭐⭐</strong> produits vérifiés</div>
+      <div class="trust-item"><strong>↩️ Retour</strong> simple et rapide</div>
+    </div>
+  </div>
+</div>
+
+<div class="container pdp-sections">
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="tab-description" role="tab">Description</button>
+    {% if product.attributes.all %}
+      <button class="tab-btn" data-tab="tab-specs" role="tab">Caractéristiques</button>
+    {% endif %}
+    <button class="tab-btn" data-tab="tab-reviews" role="tab">Avis ({{ product.review_count }})</button>
+  </div>
+
+  <div id="tab-description" class="tab-panel active">
+    {% if product.description %}
+      <div class="pdp-description">{{ product.description|linebreaksbr }}</div>
+    {% else %}
+      <p style="color:var(--muted);">Pas encore de description détaillée pour ce produit.</p>
+    {% endif %}
+  </div>
+
+  {% if product.attributes.all %}
+    <div id="tab-specs" class="tab-panel">
+      <table class="specs">
+        {% for attr in product.attributes.all %}
+          <tr><td>{{ attr.label }}</td><td>{{ attr.value }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endif %}
+
+  <div id="tab-reviews" class="tab-panel">
+    {% if reviews %}
+      {% for review in reviews %}
+        <div class="review">
+          <div class="review-head">
+            <span>{{ review.name }}</span>
+            <span class="stars">★ {{ review.rating }}</span>
+            <span class="review-date">{{ review.created_at|date:"d/m/Y" }}</span>
+          </div>
+          <p>{{ review.comment }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:var(--muted);">Aucun avis pour le moment.</p>
+    {% endif %}
+
+    <form class="review-form" action="{% url 'catalog:submit_review' product.slug %}" method="post">
+      {% csrf_token %}
+      <h3 style="margin:0;">Donner votre avis</h3>
+      <label for="review-name">Votre nom</label>
+      <input type="text" id="review-name" name="name" required>
+      <label>Votre note</label>
+      <div class="radio-row">
+        {% for i in "12345"|make_list %}
+          <label><input type="radio" name="rating" value="{{ i }}" {% if forloop.first %}checked{% endif %} required> {{ i }}★</label>
+        {% endfor %}
+      </div>
+      <label for="review-comment">Votre avis</label>
+      <textarea id="review-comment" name="comment" rows="4" required></textarea>
+      <button class="btn btn-primary" type="submit" style="margin-top:12px;">Envoyer l'avis</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

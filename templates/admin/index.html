@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+{% if dashboard %}
+  <div class="dashboard-grid">
+    <a class="kpi" href="{% url 'admin:orders_order_changelist' %}">
+      <div class="kpi-value">{{ dashboard.revenue_week|floatformat:0 }} DA</div>
+      <div class="kpi-label">Revenus (7 derniers jours)</div>
+    </a>
+    <a class="kpi" href="{% url 'admin:orders_order_changelist' %}?status__exact=paid">
+      <div class="kpi-value">{{ dashboard.revenue_today|floatformat:0 }} DA</div>
+      <div class="kpi-label">Revenus aujourd'hui</div>
+    </a>
+    <a class="kpi" href="{% url 'admin:orders_order_changelist' %}?status__exact=pending">
+      <div class="kpi-value">{{ dashboard.orders_pending }}</div>
+      <div class="kpi-label">Commandes en attente</div>
+    </a>
+    <a class="kpi" href="{% url 'admin:orders_order_changelist' %}?created_at__date={{ dashboard.today|date:"Y-m-d" }}">
+      <div class="kpi-value">{{ dashboard.orders_today }}</div>
+      <div class="kpi-label">Commandes aujourd'hui</div>
+    </a>
+    <a class="kpi" href="{% url 'admin:orders_order_changelist' %}">
+      <div class="kpi-value">{{ dashboard.orders_week }}</div>
+      <div class="kpi-label">Commandes cette semaine</div>
+    </a>
+    <a class="kpi" href="{% url 'admin:catalog_product_changelist' %}?is_active__exact=1">
+      <div class="kpi-value">{{ dashboard.active_products }}</div>
+      <div class="kpi-label">Produits en ligne</div>
+    </a>
+  </div>
+
+  {% if dashboard.low_stock %}
+    <div class="stock-warn">
+      <h3>⚠️ Stock faible (moins de 5 exemplaires)</h3>
+      <table>
+        <thead><tr><th>Produit</th><th>Stock</th><th>Prix</th></tr></thead>
+        <tbody>
+        {% for p in dashboard.low_stock %}
+          <tr>
+            <td><a href="{% url 'admin:catalog_product_change' p.pk %}">{{ p.name }}</a></td>
+            <td class="low">{{ p.stock }}</td>
+            <td>{{ p.price|floatformat:0 }} DA</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endif %}
+
+{{ block.super }}
+{% endblock %}

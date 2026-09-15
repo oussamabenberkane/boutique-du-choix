@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+{% block title %}Commande {{ order.order_number }} — {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:760px;padding:40px 18px;">
+  <h1 style="font-size:1.5rem;margin:0 0 4px;">Commande {{ order.order_number }}</h1>
+  <p style="color:var(--muted);">Passée le {{ order.created_at|date:"d/m/Y à H:i" }} • {{ order.email }}</p>
+
+  <div class="step-track" style="justify-content:flex-start;margin:18px 0 26px;">
+    {% for label, done, active in steps %}
+      <span class="step {% if done %}done{% elif active %}active{% endif %}"><span class="dot"></span>{{ label }}</span>
+    {% endfor %}
+  </div>
+
+  {% for item in order.items.all %}
+    <div class="cart-line" style="grid-template-columns:1fr auto;">
+      <div style="font-size:.92rem;">
+        <div style="font-weight:700;">{{ item.product_name }}{% if item.variant_label %} <span style="color:var(--muted);font-weight:400;">({{ item.variant_label }})</span>{% endif %}</div>
+        <div style="color:var(--muted);font-size:.82rem;">{{ item.quantity }} × {{ item.unit_price|floatformat:0 }} {{ store_currency_symbol }}</div>
+      </div>
+      <div style="font-weight:700;">{{ item.line_total|floatformat:0 }} {{ store_currency_symbol }}</div>
+    </div>
+  {% endfor %}
+
+  <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:18px 20px;">
+    <div class="summary-row"><span>Sous-total</span><span>{{ order.subtotal|floatformat:0 }} {{ store_currency_symbol }}</span></div>
+    <div class="summary-row"><span>Livraison</span><span>{% if order.shipping == 0 %}Offerte{% else %}{{ order.shipping|floatformat:0 }} {{ store_currency_symbol }}{% endif %}</span></div>
+    <div class="summary-row summary-total"><span>Total</span><span>{{ order.total|floatformat:0 }} {{ store_currency_symbol }}</span></div>
+  </div>
+
+  <div class="trust-row" style="margin-top:22px;">
+    <div class="trust-item"><strong>Statut</strong>{{ order.status_label }}</div>
+    <div class="trust-item"><strong>Paiement</strong>{{ order.payment_status }}</div>
+    <div class="trust-item"><strong>Livraison à</strong>{{ order.address }}, {{ order.city }}</div>
+  </div>
+</div>
+{% endblock %}

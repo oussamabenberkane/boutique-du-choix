@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% if page_title %}{{ page_title }} — {% endif %}{{ store_name }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/logo.svg' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <div class="announce">
+    💡 Livraison offerte dès {{ free_shipping_threshold }} {{ store_currency_symbol }} —
+    paiement à la livraison ou en ligne (Edahabia / CIB)
+  </div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="mainNav">☰</button>
+
+      <a class="brand" href="{% url 'core:home' %}" aria-label="{{ store_name }}">
+        <img class="brand-icon" src="{% static 'img/logo.svg' %}" alt="{{ store_name }}" width="42" height="42">
+      </a>
+
+      <nav id="mainNav" class="main-nav" aria-label="Navigation principale">
+        <a href="{% url 'core:home' %}">Accueil</a>
+        <a href="{% url 'catalog:product_list' %}">Tous les produits</a>
+        {% for cat in store_categories|slice:":6" %}
+          <a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
+        {% endfor %}
+      </nav>
+
+      <div class="header-actions">
+        <form class="header-search" action="{% url 'catalog:product_list' %}" method="get" role="search">
+          <input type="search" name="q" placeholder="Rechercher…" aria-label="Rechercher un produit">
+        </form>
+        {% if user.is_authenticated %}
+          <a class="header-link" href="{% url 'accounts:dashboard' %}">Mon compte</a>
+        {% else %}
+          <a class="header-link" href="{% url 'accounts:login' %}">Connexion</a>
+        {% endif %}
+        <a class="cart-link" href="{% url 'cart:cart_detail' %}">
+          <span aria-hidden="true">🛒</span>
+          <span class="cart-count" id="cartCount">{{ cart_count }}</span>
+          <span class="visually-hidden">Panier</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  {% if messages %}
+    <div class="container messages" role="status">
+      {% for message in messages %}
+        <div class="message message-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>{{ store_name }}</h4>
+        <p>Des produits choisis avec soin, livrés partout en Algérie.</p>
+        <p>Paiement à la livraison ou en ligne (Edahabia / CIB).</p>
+      </div>
+      <div>
+        <h4>Liens utiles</h4>
+        <a href="{% url 'core:about' %}">À propos</a>
+        <a href="{% url 'catalog:product_list' %}">Catalogue</a>
+        <a href="{% url 'cart:cart_detail' %}">Panier</a>
+      </div>
+      <div>
+        <h4>Suivi de commande</h4>
+        <a href="{% url 'accounts:dashboard' %}">Mon compte</a>
+        <a href="{% url 'orders:checkout' %}">Commander</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      &copy; {{ store_name }} — boutique de choix.
+    </div>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}Mon compte — {{ store_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding:40px 18px;max-width:860px;">
+  <h1 style="font-size:1.5rem;margin:0 0 6px;">Bonjour, {{ user.first_name|default:user.email }} 👋</h1>
+  <p style="color:var(--muted);">
+    <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" style="background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font-size:inherit;">Se déconnecter</button>
+    </form>
+  </p>
+
+  <h2 style="font-size:1.2rem;margin:30px 0 14px;">Vos commandes</h2>
+  {% if orders %}
+    <div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;">
+      {% for order in orders %}
+        <a href="{{ order.get_absolute_url }}" style="display:block;padding:14px 18px;border-bottom:1px solid var(--line);color:var(--ink);">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+            <span style="font-weight:700;">{{ order.order_number }}</span>
+            <span>{{ order.total|floatformat:0 }} {{ store_currency_symbol }} — {{ order.status_label }}</span>
+          </div>
+          <div style="font-size:.84rem;color:var(--muted);margin-top:2px;">{{ order.created_at|date:"d/m/Y" }} • {{ order.payment_status }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color:var(--muted);">Aucune commande pour le moment.</p>
+    <a class="btn btn-primary" href="{% url 'catalog:product_list' %}">Explorer le catalogue</a>
+  {% endif %}
+</div>
+{% endblock %}

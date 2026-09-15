@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Boutique de Choix') }}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">
+  <img src="{% static 'img/logo.svg' %}" alt="" width="22" height="22" style="vertical-align:-4px; margin-right:8px;">
+  {{ site_header|default:_('Boutique de Choix — Administration') }}
+</a></div>
+{% endblock %}
+
+{% block userlinks %}
+  <a class="shop-link" href="{% url 'core:home' %}" target="_blank">Voir la boutique</a>
+  {{ block.super }}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

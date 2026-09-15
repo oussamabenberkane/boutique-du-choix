@@ -1,0 +1,59 @@
+{% extends "core/base.html" %}
+{% block title %}Commander — {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container checkout-layout">
+  <div>
+    <h1 style="font-size:1.7rem;margin:34px 0 18px;">Finaliser ma commande</h1>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-grid">
+        {% for field in form %}
+          {% if field.name == "notes" or field.name == "payment_method" %}
+            <div class="form-field full">
+              <label>{{ field.label }}</label>
+              {% if field.name == "payment_method" %}
+                {% for radio in field %}
+                  <label class="payment-choice">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                  </label>
+                {% endfor %}
+              {% else %}
+                {{ field }}
+              {% endif %}
+              {% if field.errors %}<span class="error">{{ field.errors|first }}</span>{% endif %}
+            </div>
+          {% else %}
+            <div class="form-field {% if field.errors %}error{% endif %}">
+              <label>{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<span class="error">{{ field.errors|first }}</span>{% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <button class="btn btn-primary btn-lg" type="submit" style="margin-top:10px;">Confirmer la commande</button>
+    </form>
+  </div>
+
+  <aside class="summary">
+    <h3>Votre commande</h3>
+    {% for line in cart.items %}
+      <div class="summary-row">
+        <span>{{ line.product.name }}{% if line.variant %} ({{ line.variant.name }}){% endif %} × {{ line.quantity }}</span>
+        <span>{{ line.total|floatformat:0 }} {{ store_currency_symbol }}</span>
+      </div>
+    {% endfor %}
+    <div class="summary-row" style="border-top:1px solid var(--line);margin-top:8px;padding-top:10px;">
+      <span>Sous-total</span><span>{{ cart.subtotal|floatformat:0 }} {{ store_currency_symbol }}</span>
+    </div>
+    <div class="summary-row"><span>Livraison</span>
+      <span>{% if cart.shipping == 0 %}Offerte{% else %}{{ cart.shipping|floatformat:0 }} {{ store_currency_symbol }}{% endif %}</span>
+    </div>
+    <div class="summary-row summary-total"><span>Total</span><span>{{ cart.grand_total|floatformat:0 }} {{ store_currency_symbol }}</span></div>
+    <p class="gtin" style="margin-top:10px;">🛡️ Paiement sécurisé via Chargily (Edahabia / CIB).</p>
+  </aside>
+</div>
+{% endblock %}

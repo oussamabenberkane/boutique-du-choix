@@ -1,0 +1,66 @@
+{% extends "core/base.html" %}
+{% block title %}Panier — {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container cart-layout">
+  <div>
+    <h1 style="font-size:1.7rem;margin:34px 0 6px;">Votre panier</h1>
+
+    {% if cart.free_shipping_remaining > 0 %}
+      <div class="alert-free-ship">🚚 Plus que {{ cart.free_shipping_remaining|floatformat:0 }} {{ store_currency_symbol }} pour bénéficier de la livraison offerte !</div>
+    {% else %}
+      <div class="alert-free-ship">🎉 La livraison vous est offerte !</div>
+    {% endif %}
+
+    {% if lines %}
+      {% for line in lines %}
+        <div class="cart-line{% if not line.product.primary_image %} mp{% endif %}">
+          {% if line.product.primary_image %}
+            <a href="{{ line.product.get_absolute_url }}"><img src="{{ line.product.primary_image.image.url }}" alt="{{ line.product.name }}"></a>
+          {% endif %}
+          <div>
+            <div class="cart-line-name">
+              <a href="{{ line.product.get_absolute_url }}">{{ line.product.name }}</a>
+            </div>
+            {% if line.variant %}
+              <div class="cart-line-variant">Déclinaison : {{ line.variant.name }}</div>
+            {% endif %}
+            <div class="cart-line-variant">{{ line.unit_price|floatformat:0 }} {{ store_currency_symbol }} / unité</div>
+            <div class="cart-actions-inline">
+              <form action="{% url 'cart:update_cart' line.key %}" method="post">
+                {% csrf_token %}
+                <input class="qty-input" type="number" name="quantity" value="{{ line.quantity }}" min="0" max="99" aria-label="Quantité">
+              </form>
+              <form action="{% url 'cart:remove_item' line.key %}" method="post">
+                {% csrf_token %}
+                <button class="cart-remove" type="submit">Retirer</button>
+              </form>
+            </div>
+          </div>
+          <div class="cart-line-price">{{ line.total|floatformat:0 }} {{ store_currency_symbol }}</div>
+        </div>
+      {% endfor %}
+
+      <p style="margin-top:24px;">
+        <a class="btn btn-outline btn-sm" href="{% url 'catalog:product_list' %}">← Continuer mes achats</a>
+      </p>
+    {% else %}
+      <p style="color:var(--muted);margin-top:20px;">Votre panier est vide.</p>
+      <a class="btn btn-primary" href="{% url 'catalog:product_list' %}">Découvrir nos produits</a>
+    {% endif %}
+  </div>
+
+  <aside class="summary">
+    <h3>Récapitulatif</h3>
+    <div class="summary-row"><span>Sous-total</span><span>{{ cart.subtotal|floatformat:0 }} {{ store_currency_symbol }}</span></div>
+    <div class="summary-row"><span>Livraison</span>
+      <span>{% if cart.shipping == 0 %}Offerte{% else %}{{ cart.shipping|floatformat:0 }} {{ store_currency_symbol }}{% endif %}</span>
+    </div>
+    <div class="summary-row summary-total"><span>Total</span><span>{{ cart.grand_total|floatformat:0 }} {{ store_currency_symbol }}</span></div>
+    {% if lines %}
+      <a class="btn btn-primary btn-lg" style="margin-top:16px;" href="{% url 'orders:checkout' %}">Passer la commande</a>
+      <p class="gtin" style="text-align:center;margin:10px 0 0;">Paiement à la livraison ou en ligne (Edahabia / CIB)</p>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

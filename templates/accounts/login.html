@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+{% block title %}Connexion — {{ store_name }}{% endblock %}
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card">
+    <h1>Connexion</h1>
+    <p class="sub">Retrouvez vos commandes. La commande sans compte reste possible.</p>
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<p style="color:var(--red);font-size:.88rem;">{{ form.non_field_errors|first }}</p>{% endif %}
+      <div class="form-field">
+        <label for="id_username">Nom d'utilisateur ou e-mail</label>
+        {{ form.username }}
+      </div>
+      <div class="form-field">
+        <label for="id_password">Mot de passe</label>
+        {{ form.password }}
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit">Se connecter</button>
+    </form>
+    <p style="margin-top:20px;font-size:.92rem;text-align:center;">
+      Pas encore de compte ? <a href="{% url 'accounts:signup' %}">Créer un compte</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "core/base.html" %}
+{% block title %}{{ page_title }} — {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="section-head" style="margin-top:34px;">
+    <div>
+      <h1 style="margin:0 0 6px;font-size:1.7rem;">{{ page_title }}</h1>
+      {% if category_description %}<p style="color:var(--muted);margin:0;">{{ category_description }}</p>{% endif %}
+    </div>
+  </div>
+
+  <form class="filter-bar" method="get" action="{% url 'catalog:product_list' %}">
+    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+    {% if selected_category %}<input type="hidden" name="categorie" value="{{ selected_category.slug }}">{% endif %}
+
+    <label for="f-cat">Catégorie</label>
+    <select id="f-cat" name="categorie" onchange="this.form.submit()">
+      <option value="">Toutes</option>
+      {% for cat in categories %}
+        <option value="{{ cat.slug }}" {% if selected_category and selected_category.pk == cat.pk %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="f-price">Prix</label>
+    <select id="f-price" name="prix" onchange="this.form.submit()">
+      <option value="any" {% if active_filter == 'any' %}selected{% endif %}>Tous les prix</option>
+      <option value="lt1000" {% if active_filter == 'lt1000' %}selected{% endif %}>Moins de 1000 DA</option>
+      <option value="1000_3000" {% if active_filter == '1000_3000' %}selected{% endif %}>1000 – 3000 DA</option>
+      <option value="3000_7000" {% if active_filter == '3000_7000' %}selected{% endif %}>3000 – 7000 DA</option>
+      <option value="gt7000" {% if active_filter == 'gt7000' %}selected{% endif %}>Plus de 7000 DA</option>
+    </select>
+
+    <label for="f-stock">Disponibilité</label>
+    <select id="f-stock" name="stock" onchange="this.form.submit()">
+      <option value="">Tout</option>
+      <option value="dispo" {% if in_stock_only %}selected{% endif %}>En stock seulement</option>
+    </select>
+
+    <label for="f-sort">Trier</label>
+    <select id="f-sort" name="tri" onchange="this.form.submit()">
+      <option value="pertinence" {% if sort_by == 'pertinence' %}selected{% endif %}>Pertinence</option>
+      <option value="prix_asc" {% if sort_by == 'prix_asc' %}selected{% endif %}>Prix croissant</option>
+      <option value="prix_desc" {% if sort_by == 'prix_desc' %}selected{% endif %}>Prix décroissant</option>
+      <option value="note" {% if sort_by == 'note' %}selected{% endif %}>Mieux notés</option>
+    </select>
+
+    {% if query %}
+      <span style="font-size:.88rem;color:var(--muted);">Résultats pour « {{ query }} »</span>
+    {% endif %}
+  </form>
+
+  <p class="result-count">{{ products|length }} produit(s)</p>
+
+  {% if products %}
+    <div class="grid">
+      {% for product in products %}
+        {% include "catalog/_product_card.html" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color:var(--muted);padding:30px 0;">Aucun produit ne correspond à ces critères.</p>
+  {% endif %}
+</div>
+{% endblock %}

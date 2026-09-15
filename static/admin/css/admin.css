@@ -1,0 +1,256 @@
+:root {
+  --brand-accent: #b2673d;
+  --brand-accent-soft: #c98b62;
+  --brand-dark: #23333d;
+}
+
+/* ---------------------------------------------------------------------------
+   Structure & header
+--------------------------------------------------------------------------- */
+body.admin,
+.admin #container {
+  background: #f5f5f2;
+  font-family: "Karla", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+.admin #header {
+  background: var(--brand-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+}
+
+.admin #branding h1,
+.admin #branding h1 a {
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+.admin #branding h1 a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.admin #user-tools {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 0 0 20px;
+}
+
+.admin #user-tools a {
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .4);
+}
+
+.admin #user-tools a:hover {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+.admin .shop-link {
+  border: 1px solid rgba(255, 255, 255, .55) !important;
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-weight: 500;
+}
+
+.admin .shop-link:hover {
+  background: rgba(255, 255, 255, .12);
+  border-color: #fff !important;
+}
+
+.admin #content-main {
+  margin-bottom: 24px;
+}
+
+/* ---------------------------------------------------------------------------
+   Modules, tables, sidebar
+--------------------------------------------------------------------------- */
+.admin .module h2,
+.admin .module caption,
+.admin #content-related .module h2 {
+  background: var(--brand-dark);
+  color: #fff;
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.admin .module caption a,
+.admin .module h2 a {
+  color: #fff;
+}
+
+.admin #changelist {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin #toolbar,
+.admin #changelist-filter {
+  border-bottom-color: var(--hairline-color, #eaeaea);
+}
+
+.admin #changelist-form tbody tr:hover {
+  background: #faf7f3;
+}
+
+.admin #result_list th,
+.admin #result_list td {
+  padding: 9px 12px;
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons
+--------------------------------------------------------------------------- */
+.admin .button,
+.admin input[type="submit"],
+.admin input[type="button"],
+.admin .submit-row input,
+.admin a.button {
+  background: var(--brand-accent);
+  font-weight: 600;
+  transition: background .15s ease;
+}
+
+.admin .button:hover,
+.admin input[type="submit"]:hover,
+.admin input[type="button"]:hover,
+.admin .submit-row input:hover,
+.admin a.button:hover {
+  background: var(--brand-accent-soft);
+}
+
+.admin .button.secondary,
+.admin input[type="submit"].secondary,
+.admin input[type="button"].secondary,
+.admin .submit-row input.secondary,
+.admin a.button.secondary {
+  background: #d5d5d0;
+  color: #333;
+}
+
+.admin .submit-row input.default,
+.admin input[type="submit"].default {
+  background: var(--brand-accent);
+}
+
+.admin .submit-row input.default:hover,
+.admin input[type="submit"].default:hover {
+  background: var(--brand-accent-soft);
+}
+
+.admin .button.cancel-link,
+.admin a.deletelink {
+  background: #d32f2f;
+}
+
+/* ---------------------------------------------------------------------------
+   Status badges
+--------------------------------------------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.badge-pending      { background: #f59e0b; }
+.badge-paid         { background: #2563eb; }
+.badge-shipped      { background: #7c3aed; }
+.badge-delivered    { background: #16a34a; }
+.badge-cancelled    { background: #dc2626; }
+.badge-PENDING      { background: #f59e0b; }
+.badge-PAID         { background: #16a34a; }
+.badge-FAILED       { background: #dc2626; }
+.badge-CANCELED     { background: #9ca3af; }
+.badge-EXPIRED      { background: #9ca3af; }
+
+/* ---------------------------------------------------------------------------
+   Dashboard (index)
+--------------------------------------------------------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.dashboard-grid:empty,
+.dashboard-grid[style] { display: grid; }
+
+.kpi {
+  background: #fff;
+  border: 1px solid var(--hairline-color, #eaeaea);
+  border-left: 4px solid var(--brand-accent);
+  border-radius: 10px;
+  padding: 14px 18px;
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+
+a.kpi:hover {
+  box-shadow: 0 4px 14px rgba(35, 51, 61, .12);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.kpi .kpi-value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.kpi .kpi-label {
+  color: var(--body-quiet-color, #666);
+  font-size: .82rem;
+  margin-top: 4px;
+}
+
+.stock-warn {
+  margin: 22px 0;
+  background: #fff;
+  border: 1px solid var(--hairline-color, #eaeaea);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stock-warn h3 {
+  background: #fdf4ec;
+  border-bottom: 1px solid var(--hairline-color, #eaeaea);
+  margin: 0;
+  padding: 12px 16px;
+  font-size: .95rem;
+}
+
+.stock-warn table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stock-warn th {
+  text-align: left;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--body-quiet-color, #666);
+  padding: 8px 16px;
+}
+
+.stock-warn td {
+  border-top: 1px solid var(--hairline-color, #eaeaea);
+  padding: 8px 16px;
+  font-size: .9rem;
+}
+
+.low { color: #dc2626; font-weight: 700; }
+
+/* Thumbnails in list views */
+.admin .field-thumbnail img {
+  border-radius: 6px;
+  display: block;
+}

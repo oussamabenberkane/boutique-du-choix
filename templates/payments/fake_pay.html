@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}Paiement (simulation) — {{ store_name }}{% endblock %}
+{% block content %}
+<div class="container confirm-wrap">
+  <div class="confirm-icon">💳</div>
+  <h1 style="margin:10px 0 6px;">Page de paiement — mode simulation</h1>
+  <p style="color:var(--muted);">
+    Chargez la passerelle Chargily pour un vrai paiement (clés manquantes ou <code>CHARGILY_FAKE=True</code>).
+  </p>
+
+  <p>Commande <span class="order-number">{{ order.order_number }}</span></p>
+  <p>Montant : <strong>{{ order.total|floatformat:0 }} {{ store_currency_symbol }}</strong></p>
+
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+    <form action="{% url 'payments:fake_confirm' order.order_number %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="outcome" value="paid">
+      <button class="btn btn-primary" type="submit">✅ Simuler un paiement réussi</button>
+    </form>
+    <form action="{% url 'payments:fake_confirm' order.order_number %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="outcome" value="failed">
+      <button class="btn btn-outline" type="submit">❌ Simuler un échec</button>
+    </form>
+  </div>
+
+  <p style="margin-top:24px;">
+    <a class="btn btn-outline btn-sm" href="{% url 'orders:detail' order.order_number %}">Retour à ma commande</a>
+  </p>
+</div>
+{% endblock %}

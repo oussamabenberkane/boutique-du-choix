@@ -1,0 +1,37 @@
+{% load static %}
+<article class="card">
+  <a class="card-media" href="{{ product.get_absolute_url }}" aria-label="{{ product.name }}">
+    {% if product.primary_image %}
+      <img src="{{ product.primary_image.image.url }}" alt="{{ product.primary_image.alt|default:product.name }}" loading="lazy">
+    {% else %}
+      <div class="card-media-empty">Image bientôt disponible</div>
+    {% endif %}
+    {% if product.is_on_sale %}<span class="badge badge-sale" style="position:absolute;top:10px;left:10px;">-{{ product.discount_percent }}%</span>{% endif %}
+  </a>
+  <div class="card-body">
+    <div class="card-cat">{{ product.category.name }}</div>
+    <h3 class="card-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+    {% if product.average_rating %}
+      <div class="stars">★{{ product.average_rating|floatformat:1 }}</div>
+    {% endif %}
+    <div class="card-bottom">
+      <div class="price-row">
+        {% if product.is_on_sale %}<span class="price-compare">{{ product.compare_at_price|floatformat:0 }} {{ store_currency_symbol }}</span>{% endif %}
+        <span class="price">{{ product.price|floatformat:0 }} {{ store_currency_symbol }}</span>
+      </div>
+      <div class="card-actions">
+        {% if product.in_stock and not product.has_variants %}
+          <form action="{% url 'cart:add_to_cart' product.pk %}" method="post" style="flex:1;">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button class="btn btn-primary btn-sm" style="width:100%;" type="submit">Ajouter au panier</button>
+          </form>
+        {% elif product.has_variants %}
+          <a class="btn btn-primary btn-sm" style="flex:1;padding:9px 12px;" href="{{ product.get_absolute_url }}">Choisir la déclinaison</a>
+        {% else %}
+          <span class="badge badge-out">Rupture de stock</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</article>

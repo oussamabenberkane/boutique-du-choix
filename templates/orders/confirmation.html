@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+{% block title %}Commande {{ order.order_number }} — {{ store_name }}{% endblock %}
+
+{% block content %}
+<div class="container confirm-wrap">
+  <div class="confirm-icon">✅</div>
+  <h1 style="margin:10px 0 6px;">Merci pour votre commande !</h1>
+  <p style="color:var(--muted);">Votre commande a bien été enregistrée.</p>
+  <p>N° de commande : <span class="order-number">{{ order.order_number }}</span></p>
+
+  <div class="step-track">
+    {% for label, done, active in steps %}
+      <span class="step {% if done %}done{% elif active %}active{% endif %}"><span class="dot"></span>{{ label }}</span>
+    {% endfor %}
+  </div>
+
+  <div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:20px;text-align:left;margin-top:26px;">
+    <div class="summary-row"><span>Statut</span><span>{{ order.status_label }}</span></div>
+    <div class="summary-row"><span>Paiement</span><span>{{ order.payment_status }}</span></div>
+    <div class="summary-row"><span>Total</span><span>{{ order.total|floatformat:0 }} {{ store_currency_symbol }}</span></div>
+    <div class="summary-row"><span>Livraison</span><span>{{ order.address }}, {{ order.city }} ({{ order.wilaya }})</span></div>
+  </div>
+
+  {% if order.payment_method == "online" and order.payment and order.payment.status == "PENDING" %}
+    <p style="margin-top:22px;">
+      <a class="btn btn-primary btn-lg" href="{% url 'payments:checkout' order.order_number %}">Procéder au paiement — {{ order.total|floatformat:0 }} {{ store_currency_symbol }}</a>
+    </p>
+    <p style="font-size:.85rem;color:var(--muted);">Edahabia / CIB — vous serez redirigé vers la page de paiement sécurisée.</p>
+  {% endif %}
+
+  <p style="margin-top:26px;">
+    <a class="btn btn-outline" href="{% url 'core:home' %}">Retour à l'accueil</a>
+  </p>
+</div>
+{% endblock %}

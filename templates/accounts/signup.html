@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block title %}Créer un compte — {{ store_name }}{% endblock %}
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card">
+    <h1>Créer un compte</h1>
+    <p class="sub">Optionnel — vous pouvez aussi commander sans compte.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-grid">
+        {% for field in form %}
+          <div class="form-field {% if field.name == 'password1' or field.name == 'password2' %}full{% endif %}">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<small style="color:var(--muted);font-size:.8rem;">{{ field.help_text|safe }}</small>{% endif %}
+            {% if field.errors %}<span class="error">{{ field.errors|first }}</span>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit">Créer mon compte</button>
+    </form>
+    <p style="margin-top:20px;font-size:.92rem;text-align:center;">
+      Déjà inscrit ? <a href="{% url 'accounts:login' %}">Se connecter</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
