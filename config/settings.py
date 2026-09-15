@@ -83,10 +83,15 @@ AUTH_USER_MODEL = "accounts.User"
 # After admin logout, go back to the admin login page.
 LOGOUT_REDIRECT_URL = "/admin/"
 
+# The SQLite file location is environment-driven so it can be moved onto a
+# writable volume at runtime (container filesystems are read-only).
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.environ.get(
+            "DB_PATH",
+            Path(os.environ.get("DB_DIR", BASE_DIR)) / "db.sqlite3",
+        ),
     }
 }
 
