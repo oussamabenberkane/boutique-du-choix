@@ -2,37 +2,33 @@
 set -e
 cd /app
 
-echo "=== BDC STARTUP DIAGNOSTICS ==="
-echo "=== WHOAMI ==="
-id
-echo "=== MOUNTS (non-overlay) ==="
-mount | grep -Ev "overlay|proc|sys|tmpfs|cgroup" | head -30 || true
-echo "=== DF ==="
-df -h /app /tmp 2>/dev/null || true
-
-# Pick the first writable directory for the SQLite database.
-# Prefer persistent volume locations, fall back to /tmp (ephemeral).
-echo "=== PROBE WRITABLE DIRS ==="
-DB_DIR=""
-for d in /data /var/lib/data /storage /persistent /mnt/data /tmp; do
-  if [ -d "$d" ] && [ -w "$d" ]; then DB_DIR="$d"; break; fi
-  if mkdir -p "$d" 2>/dev/null && touch "$d/.belmo_t" 2>/dev/null; then
-    DB_DIR="$d"; rm -f "$d/.belmo_t"; break
-  fi
-done
-[ -z "$DB_DIR" ] && DB_DIR="/tmp"
-
-echo "=== USING DB_DIR=$DB_DIR ==="
+echo "=== BDC STARTUP ==="
+DB_DIR="/tmp"
+mkdir -p "$DB_DIR"
+export DB_DIR DB_PATH="$DB_DIR/db.sqlite3"
 
 # Seed a fresh writable DB from the baked-in image DB (keeps products/data).
-if [ ! -f "$DB_DIR/db.sqlite3" ] && [ -f /app/db.sqlite3 ]; then
-  echo "=== COPYING SEEDED DB TO $DB_DIR ==="
-  cp /app/db.sqlite3 "$DB_DIR/db.sqlite3"
+if [ ! -f "$DB_PATH" ] && [ -f /app/db.sqlite3 ]; then
+  echo "=== SEEDING DB FROM IMAGE ==="
+  cp /app/db.sqlite3 "$DB_PATH"
 fi
 
 echo "=== MIGRATE ==="
-export DB_DIR DB_PATH="$DB_DIR/db.sqlite3"
 python manage.py migrate --noinput
 
-echo "=== STARTING SERVER ==="
-python manage.py runserver 0.0.0.0:${PORT:-3000}
+echo "=== WRITE TEST ==="
+python - <<'EOF'
+import os, sqlite3
+p = os.environ["DB_PATH"]
+c = sqlite3.connect(p)
+c.execute("create table if not exists _write_test(x)")
+c.execute("insert into _write_test values (1)")
+c.commit()
+print("WRITE OK:", p)
+EOF
+
+echo "=== DJANGO DB PATH ==="
+python manage.py shell -c "from django.conf import settings; print(settings.DATABASES['default']['NAME'])" 2>&1
+
+echo "=== STARTING SERVER ON /tmp DB ==="
+exec python manage.py runserver 0.0.0.0:${PORT:-3000}
